@@ -5,6 +5,7 @@ class PerfumeData {
   final String subtitle;
   final String price;
   final Color backgroundColor;
+  final String category;
   final String? imageUrl;
   final List<String>? images;
   final String? description;
@@ -15,6 +16,7 @@ class PerfumeData {
     required this.subtitle,
     required this.price,
     required this.backgroundColor,
+    required this.category,
     this.imageUrl,
     this.images,
     this.description,

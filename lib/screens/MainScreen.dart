@@ -13,8 +13,23 @@ class PerfumeBoutiqueApp extends StatefulWidget {
 
 class _PerfumeBoutiqueAppState extends State<PerfumeBoutiqueApp> {
   int _selectedIndex = 0;
+  final TextEditingController _searchController = TextEditingController();
 
-  static const _pages = <Widget>[PerfumeCategoryPage(), PerfumeDetailPage()];
+  late final List<Widget> _pages = [
+    PerfumeCategoryPage(controller: _searchController),
+    const PerfumeDetailPage(),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,36 +58,32 @@ class _PerfumeBoutiqueAppState extends State<PerfumeBoutiqueApp> {
           child: Row(
             children: [
               Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Search tapped'),
-                        duration: Duration(milliseconds: 700),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.fromLTRB(12, 10, 8, 10),
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF6EDEB),
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    child: Row(
-                      children: const [
-                        Icon(Icons.search, color: Color(0xFFB89A96)),
-                        SizedBox(width: 10),
-                        Text(
-                          'Search',
-                          style: TextStyle(
-                            color: Color(0xFFB89A96),
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
+                child: Container(
+                  margin: const EdgeInsets.fromLTRB(12, 10, 8, 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF6EDEB),
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.search, color: Color(0xFFB89A96)),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: const InputDecoration(
+                            hintText: 'Search',
+                            border: InputBorder.none,
+                            isDense: true,
+                            contentPadding: EdgeInsets.zero,
                           ),
+                          onChanged: (v) {
+                            // The controller is listened to by PerfumeCategoryPage
+                          },
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -142,8 +153,10 @@ class _PerfumeBoutiqueAppState extends State<PerfumeBoutiqueApp> {
   }
 }
 
-class PerfumeCategoryPage extends StatelessWidget {
-  const PerfumeCategoryPage({super.key});
+class PerfumeCategoryPage extends StatefulWidget {
+  const PerfumeCategoryPage({super.key, this.controller});
+
+  final TextEditingController? controller;
 
   static final List<PerfumeData> perfumes = [
     PerfumeData(
@@ -151,6 +164,7 @@ class PerfumeCategoryPage extends StatelessWidget {
       subtitle: 'DIAMONDS SHE 100ML',
       price: '£70.00',
       backgroundColor: const Color(0xFFC9A69E),
+      category: 'J\'ADORE',
       imageUrl:
           'https://images.unsplash.com/photo-1541643600914-e0fdc6e6f8d0?w=400',
       images: [
@@ -166,6 +180,7 @@ class PerfumeCategoryPage extends StatelessWidget {
       subtitle: 'SHALIMAR SHE 100ML',
       price: '£60.00',
       backgroundColor: Colors.white,
+      category: 'MISS DIOR',
       isDarkText: true,
       imageUrl:
           'https://images.unsplash.com/photo-1588405748903-c2b3dd1ef5aa?w=400',
@@ -182,6 +197,7 @@ class PerfumeCategoryPage extends StatelessWidget {
       subtitle: 'UNIVERSAL SHE 75ML',
       price: '£75.00',
       backgroundColor: const Color(0xFFB8A89E),
+      category: 'J\'ADORE',
       imageUrl:
           'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400',
       images: [
@@ -197,6 +213,7 @@ class PerfumeCategoryPage extends StatelessWidget {
       subtitle: 'POISON EDITION 100ML',
       price: '£85.00',
       backgroundColor: const Color(0xFFD4A5A0),
+      category: 'POISON',
       imageUrl:
           'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400',
       images: [
@@ -212,6 +229,7 @@ class PerfumeCategoryPage extends StatelessWidget {
       subtitle: 'ANGE SHE 80ML',
       price: '£65.00',
       backgroundColor: Colors.white,
+      category: 'ANGE',
       isDarkText: true,
       imageUrl:
           'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400',
@@ -224,6 +242,50 @@ class PerfumeCategoryPage extends StatelessWidget {
           'Soft and charming with a delicate floral bouquet lifted by sweet fruit accords.',
     ),
   ];
+
+  @override
+  State<PerfumeCategoryPage> createState() => _PerfumeCategoryPageState();
+}
+
+class _PerfumeCategoryPageState extends State<PerfumeCategoryPage> {
+  List<PerfumeData> _displayed = PerfumeCategoryPage.perfumes;
+  String _selectedCategory = 'ALL';
+
+  @override
+  void initState() {
+    super.initState();
+    _displayed = PerfumeCategoryPage.perfumes;
+    widget.controller?.addListener(_handleSearch);
+  }
+
+  void _handleSearch() {
+    _applyFilters();
+  }
+
+  void _applyFilters() {
+    final q = widget.controller?.text.toLowerCase().trim() ?? '';
+    setState(() {
+      var list = PerfumeCategoryPage.perfumes;
+      if (_selectedCategory != 'ALL') {
+        list = list
+            .where(
+              (p) =>
+                  p.category.toUpperCase() == _selectedCategory.toUpperCase(),
+            )
+            .toList();
+      }
+      if (q.isNotEmpty) {
+        list = list.where((p) => p.title.toLowerCase().contains(q)).toList();
+      }
+      _displayed = list;
+    });
+  }
+
+  @override
+  void dispose() {
+    widget.controller?.removeListener(_handleSearch);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -286,12 +348,27 @@ class PerfumeCategoryPage extends StatelessWidget {
                 height: 42,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
-                  children: const [
-                    _CategoryChip(label: 'ALL', selected: false),
-                    _CategoryChip(label: 'J\'ADORE', selected: true),
-                    _CategoryChip(label: 'MISS DIOR', selected: false),
-                    _CategoryChip(label: 'POISON', selected: false),
-                    _CategoryChip(label: 'ANGE', selected: false),
+                  children: [
+                    for (final label in [
+                      'ALL',
+                      'J\'ADORE',
+                      'MISS DIOR',
+                      'POISON',
+                      'ANGE',
+                    ])
+                      Padding(
+                        padding: const EdgeInsets.only(right: 6),
+                        child: _CategoryChip(
+                          label: label,
+                          selected: _selectedCategory == label,
+                          onTap: () {
+                            setState(() {
+                              _selectedCategory = label;
+                              _applyFilters();
+                            });
+                          },
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -300,12 +377,12 @@ class PerfumeCategoryPage extends StatelessWidget {
                 height: screenHeight * 0.42,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: perfumes.length,
+                  itemCount: _displayed.length,
                   itemBuilder: (context, index) {
-                    final perfume = perfumes[index];
+                    final perfume = _displayed[index];
                     return Padding(
                       padding: EdgeInsets.only(
-                        right: index < perfumes.length - 1 ? 16 : 0,
+                        right: index < _displayed.length - 1 ? 16 : 0,
                       ),
                       child: SizedBox(
                         width: 180,
@@ -334,12 +411,12 @@ class PerfumeCategoryPage extends StatelessWidget {
                 height: 108,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
-                  itemCount: perfumes.length,
+                  itemCount: _displayed.length,
                   itemBuilder: (context, index) {
-                    final perfume = perfumes[index];
+                    final perfume = _displayed[index];
                     return Padding(
                       padding: EdgeInsets.only(
-                        right: index < perfumes.length - 1 ? 16 : 0,
+                        right: index < _displayed.length - 1 ? 16 : 0,
                       ),
                       child: SizedBox(
                         width: 140,
@@ -358,31 +435,39 @@ class PerfumeCategoryPage extends StatelessWidget {
 }
 
 class _CategoryChip extends StatelessWidget {
-  const _CategoryChip({required this.label, required this.selected});
+  const _CategoryChip({
+    required this.label,
+    required this.selected,
+    this.onTap,
+  });
 
   final String label;
   final bool selected;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(right: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: selected ? Colors.white : Colors.transparent,
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(
-          color: selected ? const Color(0xFF8B5E57) : Colors.transparent,
-          width: 1.2,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(right: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: selected ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(
+            color: selected ? const Color(0xFF8B5E57) : Colors.transparent,
+            width: 1.2,
+          ),
         ),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: selected ? const Color(0xFF8B5E57) : const Color(0xFFB89A96),
-          fontSize: 13,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.4,
+        child: Text(
+          label,
+          style: TextStyle(
+            color: selected ? const Color(0xFF8B5E57) : const Color(0xFFB89A96),
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.4,
+          ),
         ),
       ),
     );
