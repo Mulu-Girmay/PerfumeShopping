@@ -6,6 +6,8 @@ class PerfumeData {
   final String price;
   final Color backgroundColor;
   final String? imageUrl;
+  final List<String>? images;
+  final String? description;
   final bool isDarkText;
 
   PerfumeData({
@@ -14,6 +16,8 @@ class PerfumeData {
     required this.price,
     required this.backgroundColor,
     this.imageUrl,
+    this.images,
+    this.description,
     this.isDarkText = false,
   });
 }
