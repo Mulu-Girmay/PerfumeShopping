@@ -43,19 +43,23 @@ class _DetailScreenState extends State<DetailScreen> {
                         size: 22,
                       ),
                     ),
+
                     Expanded(
-                      child: Text(
-                        perfume.title.toUpperCase(),
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          color: Color(0xFF6F3642),
-                          fontSize: 20,
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: 1.4,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Text(
+                          perfume.title.toUpperCase(),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Color(0xFF6F3642),
+                            fontSize: 20,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 1.4,
+                          ),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 48),
+                    const SizedBox(width: 70),
                   ],
                 ),
               ),
@@ -129,12 +133,12 @@ class _DetailScreenState extends State<DetailScreen> {
 
               // Info card (brown) with concave meniscus
               Transform.translate(
-                offset: const Offset(0, 20),
+                offset: const Offset(0, 30),
                 child: ClipPath(
                   clipper: ConcaveMeniscusClipper(),
                   child: Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.fromLTRB(24, 30, 24, 22),
+                    padding: const EdgeInsets.fromLTRB(24, 40, 24, 22),
                     decoration: const BoxDecoration(
                       color: Color(0xFFB89284),
                       borderRadius: BorderRadius.only(

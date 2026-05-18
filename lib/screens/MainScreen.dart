@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:perfumeshopping/models/model.dart';
 import 'package:perfumeshopping/widget/reusablecard.dart';
+import 'package:perfumeshopping/models/cart.dart';
 import 'package:perfumeshopping/screens/DetailScreen.dart';
 import 'package:perfumeshopping/screens/basketScreen.dart';
 
@@ -14,10 +15,15 @@ class PerfumeBoutiqueApp extends StatefulWidget {
 class _PerfumeBoutiqueAppState extends State<PerfumeBoutiqueApp> {
   int _selectedIndex = 0;
   final TextEditingController _searchController = TextEditingController();
-
-  late final List<Widget> _pages = [
+  List<Widget> get _pages => [
     PerfumeCategoryPage(controller: _searchController),
-    const BasketScreen(),
+    BasketScreen(
+      onBackFallback: () {
+        setState(() {
+          _selectedIndex = 0;
+        });
+      },
+    ),
   ];
 
   @override
@@ -97,32 +103,67 @@ class _PerfumeBoutiqueAppState extends State<PerfumeBoutiqueApp> {
                 padding: const EdgeInsets.only(right: 12),
                 child: Row(
                   children: [
-                    GestureDetector(
-                      onTap: () => setState(() {
-                        if (_pages.length > 1) {
-                          _selectedIndex = 1;
-                        } else {
-                          _selectedIndex = 0;
-                        }
-                      }),
-                      child: Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(14),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x11000000),
-                              blurRadius: 6,
-                              offset: Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: const Icon(
-                          Icons.shopping_bag_outlined,
-                          color: Color(0xFF8B5E57),
-                        ),
-                      ),
+                    ValueListenableBuilder<List<PerfumeData>>(
+                      valueListenable: cartNotifier,
+                      builder: (context, cart, _) {
+                        final count = cart.length;
+                        return GestureDetector(
+                          onTap: () => setState(() {
+                            if (_pages.length > 1) {
+                              _selectedIndex = 1;
+                            } else {
+                              _selectedIndex = 0;
+                            }
+                          }),
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(14),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      color: Color(0x11000000),
+                                      blurRadius: 6,
+                                      offset: Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: const Icon(
+                                  Icons.shopping_bag_outlined,
+                                  color: Color(0xFF8B5E57),
+                                ),
+                              ),
+                              if (count > 0)
+                                Positioned(
+                                  right: -6,
+                                  top: -6,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFE85E4A),
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.white,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      count > 99 ? '99+' : '$count',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w900,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
                     const SizedBox(width: 12),
                     GestureDetector(

@@ -3,7 +3,9 @@ import 'package:perfumeshopping/models/cart.dart';
 import 'package:perfumeshopping/models/model.dart';
 
 class BasketScreen extends StatelessWidget {
-  const BasketScreen({super.key});
+  const BasketScreen({super.key, this.onBackFallback});
+
+  final VoidCallback? onBackFallback;
 
   @override
   Widget build(BuildContext context) {
@@ -13,19 +15,23 @@ class BasketScreen extends StatelessWidget {
         child: ValueListenableBuilder<List<PerfumeData>>(
           valueListenable: cartNotifier,
           builder: (context, cart, _) {
-            final canPop = Navigator.of(context).canPop();
             final topBar = Padding(
               padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
               child: Row(
                 children: [
-                  if (canPop)
-                    IconButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(
-                        Icons.arrow_back_ios_new_rounded,
-                        color: Color(0xFF8B5E57),
-                      ),
+                  IconButton(
+                    onPressed: () {
+                      if (Navigator.of(context).canPop()) {
+                        Navigator.of(context).pop();
+                      } else if (onBackFallback != null) {
+                        onBackFallback!();
+                      }
+                    },
+                    icon: const Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: Color(0xFF8B5E57),
                     ),
+                  ),
                   const SizedBox(width: 6),
                   const Expanded(
                     child: Text(
