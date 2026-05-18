@@ -22,10 +22,11 @@ class _DetailScreenState extends State<DetailScreen> {
     final imageCardHeight = (screenSize.height * 0.38).clamp(240.0, 360.0);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F3F0),
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.only(bottom: 18),
+
           child: Column(
             children: [
               Padding(
@@ -70,14 +71,8 @@ class _DetailScreenState extends State<DetailScreen> {
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(34),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x22000000),
-                            blurRadius: 24,
-                            offset: Offset(0, 12),
-                          ),
-                        ],
                       ),
+
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(34),
                         child: PageView.builder(
@@ -125,53 +120,58 @@ class _DetailScreenState extends State<DetailScreen> {
                 ),
               ),
 
-              // Info card (brown)
-              Container(
-                width: double.infinity,
-                margin: const EdgeInsets.only(top: 14),
-                padding: const EdgeInsets.fromLTRB(24, 18, 24, 22),
-                decoration: const BoxDecoration(
-                  color: Color(0xFFB89284),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(28),
-                    topRight: Radius.circular(28),
+              // Info card (brown) with concave meniscus
+              Transform.translate(
+                offset: const Offset(0, 20),
+                child: ClipPath(
+                  clipper: ConcaveMeniscusClipper(),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.fromLTRB(24, 30, 24, 22),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFB89284),
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: Radius.circular(28),
+                        bottomRight: Radius.circular(28),
+                      ),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          perfume.title,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.6,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          perfume.description ?? 'No description available.',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Color(0xFFF8EDE8),
+                            fontSize: 13,
+                            height: 1.35,
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        Text(
+                          perfume.price,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 26,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                child: Column(
-                  children: [
-                    Text(
-                      perfume.title,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.6,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      perfume.description ?? 'No description available.',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Color(0xFFF8EDE8),
-                        fontSize: 13,
-                        height: 1.35,
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    Text(
-                      perfume.price,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 26,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ],
-                ),
               ),
-
+              const SizedBox(height: 20),
               // Add to basket pill
               Padding(
                 padding: const EdgeInsets.only(bottom: 18, top: 12),
@@ -199,6 +199,7 @@ class _DetailScreenState extends State<DetailScreen> {
                         ),
                       ],
                     ),
+
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: const [
@@ -226,4 +227,35 @@ class _DetailScreenState extends State<DetailScreen> {
       ),
     );
   }
+}
+
+class ConcaveMeniscusClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    final meniscusDepth = 20.0;
+    final centerX = size.width / 2;
+
+    path.moveTo(0, 0);
+
+    path.cubicTo(
+      centerX * 0.5,
+      meniscusDepth,
+      centerX * 1.5,
+      meniscusDepth,
+      size.width,
+      0,
+    );
+
+    path.lineTo(size.width, size.height);
+
+    path.lineTo(0, size.height);
+
+    path.close();
+
+    return path;
+  }
+
+  @override
+  bool shouldReclip(ConcaveMeniscusClipper oldClipper) => false;
 }

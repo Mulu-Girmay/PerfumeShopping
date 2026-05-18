@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:perfumeshopping/models/model.dart';
 import 'package:perfumeshopping/widget/reusablecard.dart';
 import 'package:perfumeshopping/screens/DetailScreen.dart';
-import 'detailCard.dart';
 
 class PerfumeBoutiqueApp extends StatefulWidget {
   const PerfumeBoutiqueApp({super.key});
@@ -17,7 +16,6 @@ class _PerfumeBoutiqueAppState extends State<PerfumeBoutiqueApp> {
 
   late final List<Widget> _pages = [
     PerfumeCategoryPage(controller: _searchController),
-    const PerfumeDetailPage(),
   ];
 
   @override
