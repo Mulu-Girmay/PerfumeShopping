@@ -10,6 +10,7 @@ class ReusablePerfumeCard extends StatelessWidget {
     this.imageUrl,
     this.onTap,
     this.isDarkText = false,
+    this.category,
   });
 
   final String title;
@@ -19,6 +20,7 @@ class ReusablePerfumeCard extends StatelessWidget {
   final String? imageUrl;
   final VoidCallback? onTap;
   final bool isDarkText;
+  final String? category;
 
   @override
   Widget build(BuildContext context) {
@@ -60,20 +62,45 @@ class ReusablePerfumeCard extends StatelessWidget {
                 ),
               ),
             ),
+            if (category != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Text(
+                  category!,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: mutedColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
             Expanded(
               child: Center(
                 child: imageUrl != null
-                    ? Image.network(
-                        imageUrl!,
-                        fit: BoxFit.contain,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Icon(
-                            Icons.image_not_supported_outlined,
-                            color: textColor.withOpacity(0.5),
-                            size: 48,
-                          );
-                        },
-                      )
+                    ? (imageUrl!.startsWith('assets/')
+                          ? Image.asset(
+                              imageUrl!,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Icon(
+                                  Icons.image_not_supported_outlined,
+                                  color: textColor.withOpacity(0.5),
+                                  size: 48,
+                                );
+                              },
+                            )
+                          : Image.network(
+                              imageUrl!,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Icon(
+                                  Icons.image_not_supported_outlined,
+                                  color: textColor.withOpacity(0.5),
+                                  size: 48,
+                                );
+                              },
+                            ))
                     : Icon(
                         Icons.local_florist_rounded,
                         color: textColor.withOpacity(0.6),

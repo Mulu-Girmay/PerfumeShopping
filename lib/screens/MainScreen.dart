@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:perfumeshopping/models/model.dart';
 import 'package:perfumeshopping/widget/reusablecard.dart';
 import 'package:perfumeshopping/screens/DetailScreen.dart';
+import 'package:perfumeshopping/screens/basketScreen.dart';
 
 class PerfumeBoutiqueApp extends StatefulWidget {
   const PerfumeBoutiqueApp({super.key});
@@ -16,6 +17,7 @@ class _PerfumeBoutiqueAppState extends State<PerfumeBoutiqueApp> {
 
   late final List<Widget> _pages = [
     PerfumeCategoryPage(controller: _searchController),
+    const BasketScreen(),
   ];
 
   @override
@@ -35,7 +37,13 @@ class _PerfumeBoutiqueAppState extends State<PerfumeBoutiqueApp> {
       body: SafeArea(
         child: AnimatedSwitcher(
           duration: const Duration(milliseconds: 250),
-          child: _pages[_selectedIndex],
+          child: Builder(
+            builder: (context) {
+              int safeIndex = _selectedIndex;
+              if (safeIndex < 0 || safeIndex >= _pages.length) safeIndex = 0;
+              return _pages[safeIndex];
+            },
+          ),
         ),
       ),
       bottomNavigationBar: Padding(
@@ -90,7 +98,13 @@ class _PerfumeBoutiqueAppState extends State<PerfumeBoutiqueApp> {
                 child: Row(
                   children: [
                     GestureDetector(
-                      onTap: () => setState(() => _selectedIndex = 1),
+                      onTap: () => setState(() {
+                        if (_pages.length > 1) {
+                          _selectedIndex = 1;
+                        } else {
+                          _selectedIndex = 0;
+                        }
+                      }),
                       child: Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
@@ -163,12 +177,11 @@ class PerfumeCategoryPage extends StatefulWidget {
       price: '£70.00',
       backgroundColor: const Color(0xFFC9A69E),
       category: 'J\'ADORE',
-      imageUrl:
-          'https://images.unsplash.com/photo-1541643600914-e0fdc6e6f8d0?w=400',
+      imageUrl: 'assets/images/P1.png',
       images: [
-        'https://images.unsplash.com/photo-1541643600914-e0fdc6e6f8d0?w=800',
-        'https://images.unsplash.com/photo-1588405748903-c2b3dd1ef5aa?w=800',
-        'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=800',
+        'assets/images/P1.png',
+        'assets/images/P2.webp',
+        'assets/images/P3.jpg',
       ],
       description:
           'A delicate floral-oriental perfume with warm vanilla and soft floral heart notes. Elegant and timeless.',
@@ -180,12 +193,11 @@ class PerfumeCategoryPage extends StatefulWidget {
       backgroundColor: Colors.white,
       category: 'MISS DIOR',
       isDarkText: true,
-      imageUrl:
-          'https://images.unsplash.com/photo-1588405748903-c2b3dd1ef5aa?w=400',
+      imageUrl: 'assets/images/P4.jpg',
       images: [
-        'https://images.unsplash.com/photo-1588405748903-c2b3dd1ef5aa?w=800',
-        'https://images.unsplash.com/photo-1541643600914-e0fdc6e6f8d0?w=800',
-        'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800',
+        'assets/images/P4.jpg',
+        'assets/images/P5.jpg',
+        'assets/images/P6.jpg',
       ],
       description:
           'An intimate and sensual fragrance with a blend of soft florals and amber notes — modern and refined.',
@@ -196,12 +208,11 @@ class PerfumeCategoryPage extends StatefulWidget {
       price: '£75.00',
       backgroundColor: const Color(0xFFB8A89E),
       category: 'J\'ADORE',
-      imageUrl:
-          'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400',
+      imageUrl: 'assets/images/P25.jpg',
       images: [
-        'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=800',
-        'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=800',
-        'https://images.unsplash.com/photo-1541643600914-e0fdc6e6f8d0?w=800',
+        'assets/images/P25.jpg',
+        'assets/images/P13.jpg',
+        'assets/images/P14.jpg',
       ],
       description:
           'Fresh and luminous, combining citrus top notes with a soft musky base for everyday elegance.',
@@ -212,12 +223,11 @@ class PerfumeCategoryPage extends StatefulWidget {
       price: '£85.00',
       backgroundColor: const Color(0xFFD4A5A0),
       category: 'POISON',
-      imageUrl:
-          'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400',
+      imageUrl: 'assets/images/P16.jpg',
       images: [
-        'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=800',
-        'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800',
-        'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=800',
+        'assets/images/P16.jpg',
+        'assets/images/P17.jpg',
+        'assets/images/P18.jpg',
       ],
       description:
           'A bold and mysterious composition with deep fruity top notes and a rich woody base.',
@@ -229,15 +239,30 @@ class PerfumeCategoryPage extends StatefulWidget {
       backgroundColor: Colors.white,
       category: 'ANGE',
       isDarkText: true,
-      imageUrl:
-          'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400',
+      imageUrl: 'assets/images/P19.jpg',
       images: [
-        'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=800',
-        'https://images.unsplash.com/photo-1541643600914-e0fdc6e6f8d0?w=800',
-        'https://images.unsplash.com/photo-1588405748903-c2b3dd1ef5aa?w=800',
+        'assets/images/P19.jpg',
+        'assets/images/PV7.jpg',
+        'assets/images/PV8.jpg',
       ],
       description:
           'Soft and charming with a delicate floral bouquet lifted by sweet fruit accords.',
+    ),
+    PerfumeData(
+      title: 'ANGE CHARME NOIR',
+      subtitle: 'ANGE NOIR 80ML',
+      price: '£85.00',
+      backgroundColor: const Color(0xFFE8D6D4),
+      category: 'ANGE',
+      isDarkText: false,
+      imageUrl: 'assets/images/PV9.jpg',
+      images: [
+        'assets/images/PV10.jpg',
+        'assets/images/P15.jpg',
+        'assets/images/p11.jpg',
+      ],
+      description:
+          'A darker, more mysterious twist on the classic Ange — warm and enveloping.',
     ),
   ];
 
@@ -391,6 +416,7 @@ class _PerfumeCategoryPageState extends State<PerfumeCategoryPage> {
                           backgroundColor: perfume.backgroundColor,
                           imageUrl: perfume.imageUrl,
                           isDarkText: perfume.isDarkText,
+                          category: perfume.category,
                           onTap: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(

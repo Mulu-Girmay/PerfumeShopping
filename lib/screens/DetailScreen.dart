@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:perfumeshopping/models/model.dart';
+import 'package:perfumeshopping/models/cart.dart';
 
 class DetailScreen extends StatefulWidget {
   const DetailScreen({super.key, required this.perfume});
@@ -83,15 +84,21 @@ class _DetailScreenState extends State<DetailScreen> {
                           itemBuilder: (context, index) {
                             final url = images[index];
                             return Center(
-                              child: Image.network(
-                                url,
-                                fit: BoxFit.contain,
-                                width: screenSize.width * 0.6,
-                                errorBuilder: (c, e, s) => const Icon(
-                                  Icons.local_florist_rounded,
-                                  size: 120,
-                                ),
-                              ),
+                              child: url.startsWith('assets/')
+                                  ? Image.asset(
+                                      url,
+                                      fit: BoxFit.contain,
+                                      width: screenSize.width * 0.6,
+                                    )
+                                  : Image.network(
+                                      url,
+                                      fit: BoxFit.contain,
+                                      width: screenSize.width * 0.6,
+                                      errorBuilder: (c, e, s) => const Icon(
+                                        Icons.local_florist_rounded,
+                                        size: 120,
+                                      ),
+                                    ),
                             );
                           },
                         ),
@@ -137,6 +144,18 @@ class _DetailScreenState extends State<DetailScreen> {
                     ),
                     child: Column(
                       children: [
+                        if (perfume.category.isNotEmpty)
+                          Text(
+                            perfume.category.toUpperCase(),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Color(0xFFF8EDE8),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.6,
+                            ),
+                          ),
+                        const SizedBox(height: 8),
                         Text(
                           perfume.title,
                           textAlign: TextAlign.center,
@@ -153,8 +172,8 @@ class _DetailScreenState extends State<DetailScreen> {
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             color: Color(0xFFF8EDE8),
-                            fontSize: 13,
-                            height: 1.35,
+                            fontSize: 14,
+                            height: 1.45,
                           ),
                         ),
                         const SizedBox(height: 14),
@@ -177,6 +196,7 @@ class _DetailScreenState extends State<DetailScreen> {
                 padding: const EdgeInsets.only(bottom: 18, top: 12),
                 child: GestureDetector(
                   onTap: () {
+                    addToCart(perfume);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Added ${perfume.title} to basket'),
